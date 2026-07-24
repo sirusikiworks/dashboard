@@ -69,6 +69,7 @@
   .ev.c-admin{background:#e7dcc2;color:#7a6228;}
   .ev.recur::before{content:"\21BB ";opacity:.7;}
   .ev.admin::before{content:"\26A0 ";opacity:.8;}
+  .wl-badge{position:absolute;bottom:3px;right:5px;font-size:.6rem;color:#7a6228;background:#fff;border:1px solid var(--gold);border-radius:6px;padding:0 4px;line-height:1.4;}
   .right{display:flex;flex-direction:column;gap:14px;}
   .lists{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   @media(max-width:560px){.lists{grid-template-columns:1fr}}
@@ -96,6 +97,16 @@
   .memo textarea{width:100%;min-height:80px;border:1px solid var(--line);background:#fcfbf8;border-radius:8px;padding:9px 11px;font-size:.86rem;font-family:inherit;color:var(--ink);resize:vertical;outline:none;line-height:1.6;}
   .memo textarea:focus{border-color:var(--gold);background:#fff;}
   .hint{font-size:.68rem;color:var(--sub);text-align:center;margin-top:10px;}
+  /* utilization panel */
+  .util{padding:14px 16px;}
+  .util-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px;}
+  .util-head h2{font-size:.92rem;font-weight:700;}
+  .util-month{font-size:.72rem;color:var(--sub);}
+  .util-time{font-size:1.7rem;font-weight:700;color:var(--ink);margin-bottom:9px;}
+  .util-time .u{font-size:.62rem;font-weight:600;color:var(--sub);margin-left:3px;}
+  .gauge-track{width:100%;height:10px;background:#eee8db;border-radius:6px;overflow:hidden;}
+  .gauge-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),#8a6a3a);border-radius:6px;transition:width .3s;}
+  .util-sub{font-size:.76rem;color:var(--sub);margin-top:8px;}
   .modal-bg{position:fixed;inset:0;background:rgba(43,41,38,.42);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;}
   .modal-bg.show{display:flex;}
   .modal{background:#fff;border-radius:14px;padding:18px;width:100%;max-width:400px;max-height:88vh;overflow:auto;box-shadow:var(--shadow);}
@@ -113,7 +124,7 @@
   .modal-btns{display:flex;gap:8px;margin-top:14px;}
   .modal-btns button{flex:1;border:none;border-radius:8px;padding:10px;font-size:.88rem;font-weight:600;cursor:pointer;}
   .btn-add{background:var(--ink);color:#fff;}.btn-add:hover{background:var(--gold);}
-  .btn-close{background:#f4f2ec;color:var(--ink);}
+  .btn-close{background:#f4f2ec;color:var(--ink);border:none;border-radius:8px;padding:10px;font-size:.88rem;font-weight:600;cursor:pointer;}
   .seg{display:flex;gap:6px;}
   .seg button{flex:1;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px;font-size:.8rem;cursor:pointer;font-family:inherit;}
   .seg button.on{background:var(--ink);color:#fff;border-color:var(--ink);}
@@ -123,6 +134,29 @@
   .help ol{margin:8px 0 8px 18px;}
   .help li{margin-bottom:6px;}
   .help .warn{background:#fbf2e8;border:1px solid #e7d2b5;border-radius:8px;padding:9px 11px;color:#8a6a3a;margin-top:8px;}
+  /* modal tabs / swipe pages (予定 / 日報) */
+  .modal-tabs{display:flex;gap:6px;margin:2px 0 12px;}
+  .mtab{flex:1;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 6px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink);}
+  .mtab.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .mtab-badge{margin-left:5px;font-size:.66rem;background:var(--gold);color:#fff;border-radius:8px;padding:0 6px;}
+  .mtab.on .mtab-badge{background:#fff;color:var(--ink);}
+  .modal-pages{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;touch-action:pan-x;}
+  .modal-pages::-webkit-scrollbar{display:none;}
+  .modal-page{flex:0 0 100%;min-width:100%;scroll-snap-align:start;}
+  .wl-list{display:flex;flex-direction:column;gap:5px;max-height:150px;overflow:auto;margin-bottom:6px;}
+  .wl-row{display:flex;align-items:center;gap:7px;background:#f7f5ef;border-radius:7px;padding:6px 8px;font-size:.78rem;}
+  .wl-row .time{font-weight:700;white-space:nowrap;}
+  .wl-row .dur{font-size:.66rem;color:var(--sub);background:#fff;border-radius:10px;padding:1px 7px;white-space:nowrap;}
+  .wl-row .cat{font-size:.66rem;background:var(--gold-soft);color:#7a6228;border-radius:6px;padding:2px 6px;white-space:nowrap;}
+  .wl-row .note{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .wl-row .x{cursor:pointer;color:var(--sub);}
+  .wl-total{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .wl-time-row{display:flex;align-items:center;gap:7px;}
+  .wl-time-row input{flex:1;}
+  .wl-tilde{color:var(--sub);font-size:.85rem;}
+  .wl-cats{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px;}
+  .wl-cat-btn{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 12px;font-size:.78rem;cursor:pointer;font-family:inherit;color:var(--ink);}
+  .wl-cat-btn.on{background:var(--ink);color:#fff;border-color:var(--ink);}
 </style>
 </head>
 <body>
@@ -153,10 +187,19 @@
     </div>
     <div class="grid" id="dowRow"></div>
     <div class="grid" id="calGrid" style="margin-top:5px"></div>
-    <div class="hint">日付をタップで予定を追加（繰り返し業務も設定可）／ 予定はドラッグで別の日へ ／ ⚠は行政業務リマインド</div>
+    <div class="hint">日付をタップで予定を追加／モーダル内は左右スワイプで「予定」⇄「日報」を切替／予定はドラッグで別の日へ／⚠は行政業務リマインド</div>
   </div>
 
   <div class="right">
+    <div class="panel util" id="utilPanel">
+      <div class="util-head">
+        <h2>稼働率</h2>
+        <span class="util-month" id="utilMonthLabel"></span>
+      </div>
+      <div class="util-time" id="utilTime">0:00<span class="u">稼働時間</span></div>
+      <div class="gauge-track"><div class="gauge-fill" id="gaugeFill"></div></div>
+      <div class="util-sub" id="utilSub"></div>
+    </div>
     <div class="lists" id="lists"></div>
     <div class="panel list memo">
       <div class="list-head"><span class="dot" style="background:#9a857c"></span><h2>メモ</h2></div>
@@ -168,27 +211,48 @@
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <h3 id="modalDate"></h3>
-    <div class="modal-evlist" id="modalEvList"></div>
-    <label>予定・やること</label>
-    <input id="evInput" placeholder="例：給料計算" />
-    <div class="colors" id="colorPick">
-      <div class="c sel" data-c="" style="background:#f0e9d8"></div>
-      <div class="c" data-c="c-red" style="background:#f6dcce"></div>
-      <div class="c" data-c="c-blue" style="background:#dde7ef"></div>
-      <div class="c" data-c="c-green" style="background:#dde9d8"></div>
+    <div class="modal-tabs" id="modalTabs">
+      <button class="mtab on" data-idx="0" type="button">📅 予定</button>
+      <button class="mtab" data-idx="1" type="button">📝 日報<span class="mtab-badge" id="wlDayTotal" style="display:none"></span></button>
     </div>
-    <label>繰り返し</label>
-    <div class="seg" id="recurSeg">
-      <button data-r="none" class="on">なし</button>
-      <button data-r="monthly">毎月</button>
-      <button data-r="yearly">毎年</button>
-      <button data-r="weekly">毎週</button>
+    <div class="modal-pages" id="modalPages">
+      <div class="modal-page">
+        <div class="modal-evlist" id="modalEvList"></div>
+        <label>予定・やること</label>
+        <input id="evInput" placeholder="例：給料計算" />
+        <div class="colors" id="colorPick">
+          <div class="c sel" data-c="" style="background:#f0e9d8"></div>
+          <div class="c" data-c="c-red" style="background:#f6dcce"></div>
+          <div class="c" data-c="c-blue" style="background:#dde7ef"></div>
+          <div class="c" data-c="c-green" style="background:#dde9d8"></div>
+        </div>
+        <label>繰り返し</label>
+        <div class="seg" id="recurSeg">
+          <button data-r="none" class="on" type="button">なし</button>
+          <button data-r="monthly" type="button">毎月</button>
+          <button data-r="yearly" type="button">毎年</button>
+          <button data-r="weekly" type="button">毎週</button>
+        </div>
+        <div class="recur-opts" id="recurOpts"></div>
+        <button class="btn-add" id="evAdd" type="button" style="width:100%;margin-top:12px">追加</button>
+      </div>
+      <div class="modal-page">
+        <div class="wl-list" id="wlList"></div>
+        <div class="wl-total" id="wlTotal"></div>
+        <label>時間帯（何時から何時）</label>
+        <div class="wl-time-row">
+          <input type="time" id="wlStart">
+          <span class="wl-tilde">〜</span>
+          <input type="time" id="wlEnd">
+        </div>
+        <label>カテゴリ</label>
+        <div class="wl-cats" id="wlCats"></div>
+        <label>内容（簡潔に）</label>
+        <input id="wlNote" placeholder="例：リール編集・投稿準備" />
+        <button class="btn-add" id="wlAdd" type="button" style="width:100%;margin-top:12px">この時間を記録する</button>
+      </div>
     </div>
-    <div class="recur-opts" id="recurOpts"></div>
-    <div class="modal-btns">
-      <button class="btn-add" id="evAdd">追加</button>
-      <button class="btn-close" id="evClose">閉じる</button>
-    </div>
+    <button class="btn-close" id="evClose" type="button" style="width:100%;margin-top:12px">閉じる</button>
   </div>
 </div>
 
@@ -269,18 +333,33 @@ const ADMIN_TASKS=[
   {text:'給与支払報告書 提出（各市区町村・電子）',type:'yearly',month:1,day:31,note:'1月31日'},
   {text:'償却資産申告 提出',type:'yearly',month:1,day:31,note:'1月31日'},
 ];
+// 日報カテゴリ
+const WORK_CATEGORIES=[
+  {id:'ig',label:'IG'},
+  {id:'threads',label:'Threads'},
+  {id:'note',label:'note'},
+  {id:'blog',label:'blog'},
+  {id:'millegrue',label:'ミルグレイ'},
+  {id:'other',label:'その他'},
+];
 
 let data=load();
 let view=new Date();
 let modalKey=null,modalDate=null,modalColor='',modalRecur='none';
+let wlSelectedCat=WORK_CATEGORIES[0].id;
 let syncUrl=localStorage.getItem('dashboard_sync_url')||'';
 
-function load(){try{const d=JSON.parse(localStorage.getItem(STORE));if(d)return migrate(d);}catch(e){}return {tasks:{priority:[],today:[],week:[],month:[],long:[]},events:{},recurring:[],memo:'',adminAdded:false};}
-function migrate(d){d.recurring=d.recurring||[];d.events=d.events||{};d.tasks=d.tasks||{priority:[],today:[],week:[],month:[],long:[]};return d;}
+function load(){try{const d=JSON.parse(localStorage.getItem(STORE));if(d)return migrate(d);}catch(e){}return {tasks:{priority:[],today:[],week:[],month:[],long:[]},events:{},recurring:[],memo:'',adminAdded:false,worklogs:{}};}
+function migrate(d){d.recurring=d.recurring||[];d.events=d.events||{};d.tasks=d.tasks||{priority:[],today:[],week:[],month:[],long:[]};d.worklogs=d.worklogs||{};return d;}
 function save(){localStorage.setItem(STORE,JSON.stringify(data));pushSync();}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function ymd(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 function lastDay(y,m){return new Date(y,m+1,0).getDate();}
+
+// ---- worklog time helpers ----
+function minutesFromHHMM(s){if(!s)return 0;const p=s.split(':');return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0);}
+function durationMinutes(start,end){let a=minutesFromHHMM(start),b=minutesFromHHMM(end);let d=b-a;if(d<0)d+=24*60;return d;}
+function fmtHM(totalMin){const h=Math.floor(totalMin/60),m=totalMin%60;return h+':'+String(m).padStart(2,'0');}
 
 function recurHitsOnDate(r,date){
   if(r.type==='monthly'){const ld=lastDay(date.getFullYear(),date.getMonth());const target=r.day==='last'?ld:Math.min(r.day,ld);return date.getDate()===target;}
@@ -369,12 +448,38 @@ function renderCal(){
       if(ev._manual){e.draggable=true;e.addEventListener('dragstart',ed=>{ed.stopPropagation();ed.dataTransfer.setData('text/plain',JSON.stringify({type:'event',id:ev.id,from:key}));});}
       cell.appendChild(e);
     });
+    const wl=data.worklogs[key];
+    if(wl&&wl.length){
+      const totalMin=wl.reduce((s,en)=>s+durationMinutes(en.start,en.end),0);
+      const badge=document.createElement('div');badge.className='wl-badge';badge.textContent='⏱'+fmtHM(totalMin);
+      cell.appendChild(badge);
+    }
     cell.onclick=()=>openModal(key,date);
     cell.addEventListener('dragover',ed=>{ed.preventDefault();cell.classList.add('drag-over');});
     cell.addEventListener('dragleave',()=>cell.classList.remove('drag-over'));
     cell.addEventListener('drop',ed=>{ed.preventDefault();cell.classList.remove('drag-over');let p;try{p=JSON.parse(ed.dataTransfer.getData('text/plain'));}catch(_){return;}if(p.type!=='event'||p.from===key)return;const arr=data.events[p.from]||[];const idx=arr.findIndex(x=>x.id===p.id);if(idx<0)return;const[ev]=arr.splice(idx,1);if(!arr.length)delete data.events[p.from];(data.events[key]=data.events[key]||[]).push(ev);save();renderCal();renderToday();});
     grid.appendChild(cell);
   }
+  renderUtilization();
+}
+
+function renderUtilization(){
+  const y=view.getFullYear(),m=view.getMonth();
+  const daysInMonth=lastDay(y,m);
+  let totalMin=0,workedDays=0;
+  for(let d=1;d<=daysInMonth;d++){
+    const key=y+'-'+(m+1)+'-'+d;
+    const entries=data.worklogs[key];
+    if(entries&&entries.length){
+      workedDays++;
+      entries.forEach(en=>{totalMin+=durationMinutes(en.start,en.end);});
+    }
+  }
+  const pct=daysInMonth?Math.round((workedDays/daysInMonth)*100):0;
+  document.getElementById('utilMonthLabel').textContent=`${m+1}月`;
+  document.getElementById('utilTime').innerHTML=`${fmtHM(totalMin)}<span class="u">稼働時間</span>`;
+  document.getElementById('gaugeFill').style.width=pct+'%';
+  document.getElementById('utilSub').textContent=`稼働日数 ${workedDays}日 ／ ${daysInMonth}日中（稼働率 ${pct}%）`;
 }
 
 function openModal(key,date){
@@ -384,6 +489,16 @@ function openModal(key,date){
   document.querySelectorAll('#recurSeg button').forEach(b=>b.classList.toggle('on',b.dataset.r==='none'));
   renderRecurOpts();renderModalList();
   document.getElementById('evInput').value='';
+  // worklog page reset
+  document.getElementById('wlStart').value='';
+  document.getElementById('wlEnd').value='';
+  document.getElementById('wlNote').value='';
+  renderWlCats();
+  renderWorklogPage(key);
+  // reset to tab 0 (予定) and scroll position
+  const pages=document.getElementById('modalPages');
+  document.querySelectorAll('.mtab').forEach((b,i)=>b.classList.toggle('on',i===0));
+  pages.scrollLeft=0;
   document.getElementById('modalBg').classList.add('show');
   setTimeout(()=>document.getElementById('evInput').focus(),50);
 }
@@ -416,6 +531,47 @@ function addEvent(){
   else if(modalRecur==='weekly'){const dw=parseInt(document.getElementById('recurDow').value);data.recurring.push({id:uid(),text:v,color:modalColor,type:'weekly',dow:dw});}
   else{(data.events[modalKey]=data.events[modalKey]||[]).push({id:uid(),text:v,color:modalColor});}
   inp.value='';save();renderModalList();renderCal();renderToday();inp.focus();
+}
+
+/* ---- worklog (日報) page ---- */
+function renderWlCats(){
+  const wrap=document.getElementById('wlCats');wrap.innerHTML='';
+  WORK_CATEGORIES.forEach(c=>{
+    const b=document.createElement('button');b.type='button';b.className='wl-cat-btn'+(c.id===wlSelectedCat?' on':'');b.textContent=c.label;
+    b.onclick=()=>{wlSelectedCat=c.id;document.querySelectorAll('.wl-cat-btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');};
+    wrap.appendChild(b);
+  });
+}
+function renderWorklogPage(key){
+  const wrap=document.getElementById('wlList');wrap.innerHTML='';
+  const entries=(data.worklogs[key]||[]).slice().sort((a,b)=>minutesFromHHMM(a.start)-minutesFromHHMM(b.start));
+  let total=0;
+  entries.forEach(en=>{
+    const dur=durationMinutes(en.start,en.end);total+=dur;
+    const catLabel=(WORK_CATEGORIES.find(c=>c.id===en.category)||{}).label||en.category;
+    const row=document.createElement('div');row.className='wl-row';
+    row.innerHTML=`<span class="time">${en.start}–${en.end}</span><span class="dur">${fmtHM(dur)}</span><span class="cat">${escapeHtml(catLabel)}</span><span class="note">${escapeHtml(en.note)}</span><span class="x">×</span>`;
+    row.querySelector('.x').onclick=()=>{
+      data.worklogs[key]=data.worklogs[key].filter(x=>x.id!==en.id);
+      if(!data.worklogs[key].length)delete data.worklogs[key];
+      save();renderWorklogPage(key);renderCal();
+    };
+    wrap.appendChild(row);
+  });
+  document.getElementById('wlTotal').textContent=entries.length?`この日の合計：${fmtHM(total)}`:'まだ記録がありません';
+  const badge=document.getElementById('wlDayTotal');
+  if(entries.length){badge.style.display='';badge.textContent=fmtHM(total);}else{badge.style.display='none';}
+}
+function addWorklog(){
+  const start=document.getElementById('wlStart').value;
+  const end=document.getElementById('wlEnd').value;
+  const note=document.getElementById('wlNote').value.trim();
+  if(!start||!end){alert('開始と終了の時刻を入れてください');return;}
+  if(!note){alert('内容を簡単に入力してください');return;}
+  (data.worklogs[modalKey]=data.worklogs[modalKey]||[]).push({id:uid(),start,end,category:wlSelectedCat,note});
+  document.getElementById('wlNote').value='';
+  save();renderWorklogPage(modalKey);renderCal();
+  document.getElementById('wlNote').focus();
 }
 
 /* admin bulk */
@@ -488,6 +644,23 @@ document.getElementById('syncClose').onclick=()=>document.getElementById('syncBg
 document.getElementById('syncBg').addEventListener('click',e=>{if(e.target.id==='syncBg')document.getElementById('syncBg').classList.remove('show');});
 document.getElementById('syncSave').onclick=()=>{syncUrl=document.getElementById('gasUrl').value.trim();localStorage.setItem('dashboard_sync_url',syncUrl);document.getElementById('syncBg').classList.remove('show');if(syncUrl){updateSyncUI('on');pullSync();}else updateSyncUI('off');};
 document.getElementById('syncOff').onclick=()=>{syncUrl='';localStorage.removeItem('dashboard_sync_url');document.getElementById('gasUrl').value='';updateSyncUI('off');};
+
+// worklog tab controls
+document.getElementById('wlAdd').onclick=addWorklog;
+document.getElementById('wlNote').addEventListener('keydown',e=>{if(e.key==='Enter')addWorklog();});
+const modalPagesEl=document.getElementById('modalPages');
+document.querySelectorAll('.mtab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const idx=parseInt(btn.dataset.idx,10);
+    document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    modalPagesEl.scrollTo({left:idx*modalPagesEl.clientWidth,behavior:'smooth'});
+  });
+});
+modalPagesEl.addEventListener('scroll',()=>{
+  const idx=Math.round(modalPagesEl.scrollLeft/(modalPagesEl.clientWidth||1));
+  document.querySelectorAll('.mtab').forEach((b,i)=>b.classList.toggle('on',i===idx));
+});
 
 renderAll();
 if(syncUrl){updateSyncUI('on');pullSync();}else updateSyncUI('off');
