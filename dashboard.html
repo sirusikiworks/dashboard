@@ -34,10 +34,12 @@
   .ic.base{background:#1da4a0;}
   .ic.todo{background:#5a7a9a;}
   .ic.claude{background:#cc785c;}
+  .ic.canva{background:linear-gradient(135deg,#00c4cc,#7d2ae8);font-size:.6rem;}
   .ql .grp{font-size:.64rem;color:var(--sub);font-weight:600;margin-left:-3px;}
   .today-banner{grid-column:1/-1;background:linear-gradient(100deg,#2b2926,#3a352f);color:#fff;border-radius:14px;padding:15px 18px;box-shadow:var(--shadow);}
   .today-banner .lbl{font-size:.72rem;letter-spacing:.12em;color:var(--gold);font-weight:700;}
   .today-banner h2{font-size:1.05rem;margin:3px 0 9px;}
+  .today-banner h2 .hol-name{font-size:.82rem;font-weight:600;color:#f0b48f;margin-left:8px;}
   .today-items{display:flex;flex-wrap:wrap;gap:7px;}
   .today-chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:6px 11px;font-size:.86rem;display:flex;align-items:center;gap:8px;}
   .today-chip.urgent{background:rgba(196,98,45,.28);border-color:rgba(196,98,45,.5);}
@@ -60,8 +62,10 @@
   .cell.empty{background:transparent;border-color:transparent;cursor:default;}
   .cell.today{background:var(--today);border-color:var(--gold);}
   .cell.drag-over{background:var(--gold-soft);border-color:var(--gold);border-style:dashed;}
-  .daynum{font-size:.82rem;font-weight:600;}
+  .daynum{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cell.sun .daynum{color:var(--red)}.cell.sat .daynum{color:#5a7a9a}
+  .cell.hol .daynum{color:var(--red)}
+  .hname{font-size:.58rem;font-weight:600;color:var(--red);margin-left:4px;}
   .ev{font-size:.7rem;background:var(--gold-soft);color:#7a6228;border-radius:5px;padding:1px 5px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:grab;}
   .ev.c-red{background:#f6dcce;color:#9a401a}
   .ev.c-blue{background:#dde7ef;color:#3a5a76}
@@ -111,6 +115,7 @@
   .modal-bg.show{display:flex;}
   .modal{background:#fff;border-radius:14px;padding:18px;width:100%;max-width:400px;max-height:88vh;overflow:auto;box-shadow:var(--shadow);}
   .modal h3{font-size:1rem;margin-bottom:12px;}
+  .modal h3 .hol-name{font-size:.78rem;font-weight:600;color:var(--red);margin-left:8px;}
   .modal label{font-size:.74rem;color:var(--sub);font-weight:700;display:block;margin:10px 0 4px;}
   .modal input,.modal select{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:.9rem;font-family:inherit;outline:none;background:#fff;}
   .modal input:focus,.modal select:focus{border-color:var(--gold);}
@@ -188,7 +193,7 @@
     </div>
     <div class="grid" id="dowRow"></div>
     <div class="grid" id="calGrid" style="margin-top:5px"></div>
-    <div class="hint">日付をタップで予定を追加／モーダル内は左右スワイプで「予定」⇄「日報」を切替／予定はドラッグで別の日へ／⚠は行政業務リマインド</div>
+    <div class="hint">日付をタップで予定を追加／モーダル内は左右スワイプで「予定」⇄「日報」を切替／予定はドラッグで別の日へ／⚠は行政業務リマインド／赤字は日本の祝日</div>
   </div>
 
   <div class="right">
@@ -311,18 +316,21 @@ const LISTS=[
 const QUICKLINKS=[
   {label:'インスタ',grp:'アズイル',cls:'ig',url:'https://www.instagram.com/as.iru_simplelife/',ic:'IG'},
   {label:'スレッズ',grp:'アズイル',cls:'th',url:'https://www.threads.com/@as.iru_simplelife',ic:'@'},
+  {label:'投稿管理',grp:'アズイル',cls:'base',url:'https://docs.google.com/spreadsheets/d/1BSZN3svFbZG2YezIQJ9ATGuGMUXx8kuJg9IfeHgEpt8/edit?usp=sharing',ic:'投'},
   {label:'インスタ',grp:'ミルグレイ',cls:'ig',url:'https://www.instagram.com/patisserie_millegrue/',ic:'IG'},
-  {label:'スレッズ',grp:'ミルグレイ',cls:'th',url:'https://www.threads.com/@patisserie_millegrue',ic:'@'},
+  {label:'JIMDO',grp:'ミルグレイ',cls:'hp',url:'https://dash.e.jimdo.com/websites/25112780/overview',ic:'J'},
   {label:'HP',grp:'ミルグレイ',cls:'hp',url:'https://www.millegrue.com/',ic:'H'},
-  {label:'BASE',grp:'ミルグレイ',cls:'base',url:'https://millegrue518.base.shop/',ic:'B'},
   {label:'オーナーTODO表',grp:'',cls:'todo',url:'https://docs.google.com/spreadsheets/d/1U2lgviv8TKYQH5V-TfRheY6cKCmhjn0N/edit?usp=sharing&ouid=108998898216832972463&rtpof=true&sd=true',ic:'T'},
-  {label:'Claude',grp:'AI',cls:'claude',url:'https://claude.ai',ic:'C'},
+  {label:'リール台本',grp:'',cls:'claude',url:'https://docs.google.com/spreadsheets/d/10c6HlknEXbQ0Ac1k4O1Ah39OZ03VOG6Xgmsp4buVeAE/edit?usp=sharing',ic:'R'},
+  {label:'Canva',grp:'',cls:'canva',url:'https://www.canva.com/',ic:'Cv'},
 ];
 // 行政・税務 標準業務（決算月2月想定）
+// day:'last' = 月末日 / day:'lastBiz' = 月末の平日（土日祝は直前の平日に前倒し）
 const ADMIN_TASKS=[
   {text:'給料計算',type:'monthly',day:1,note:'毎月1日'},
+  {text:'社保の金額確認',type:'monthly',day:15,note:'毎月15日'},
   {text:'振込支払い金額確認',type:'monthly',day:25,note:'毎月25日'},
-  {text:'振込支払い実行',type:'monthly',day:'last',note:'毎月末日'},
+  {text:'振込支払い実行',type:'monthly',day:'lastBiz',note:'毎月末の平日'},
   {text:'法人税・消費税 確定申告/納付（期末2/28→2か月以内）',type:'yearly',month:4,day:30,note:'4月30日'},
   {text:'労働保険 年度更新（6/1～7/10）',type:'yearly',month:6,day:1,note:'6月1日〜'},
   {text:'社会保険 算定基礎届（7/1～7/10／対象事業所のみ）',type:'yearly',month:7,day:1,note:'7月1日〜'},
@@ -344,18 +352,105 @@ const WORK_CATEGORIES=[
   {id:'other',label:'その他'},
 ];
 
+let didMigrate=false;
 let data=load();
 let view=new Date();
 let modalKey=null,modalDate=null,modalColor='',modalRecur='none';
 let wlSelectedCat=WORK_CATEGORIES[0].id;
 let syncUrl=localStorage.getItem('dashboard_sync_url')||'';
 
-function load(){try{const d=JSON.parse(localStorage.getItem(STORE));if(d)return migrate(d);}catch(e){}return {tasks:{priority:[],today:[],week:[],month:[],long:[]},events:{},recurring:[],memo:'',adminAdded:false,worklogs:{}};}
-function migrate(d){d.recurring=d.recurring||[];d.events=d.events||{};d.tasks=d.tasks||{priority:[],today:[],week:[],month:[],long:[]};d.worklogs=d.worklogs||{};return d;}
+function load(){try{const d=JSON.parse(localStorage.getItem(STORE));if(d)return migrate(d);}catch(e){}return {tasks:{priority:[],today:[],week:[],month:[],long:[]},events:{},recurring:[],memo:'',adminAdded:false,worklogs:{},mig4:true};}
+function migrate(d){
+  d.recurring=d.recurring||[];d.events=d.events||{};d.tasks=d.tasks||{priority:[],today:[],week:[],month:[],long:[]};d.worklogs=d.worklogs||{};
+  if(!d.mig4){
+    // ① 毎月「月末日」の繰り返し → 「月末の平日」へ
+    d.recurring.forEach(r=>{if(r.type==='monthly'&&r.day==='last')r.day='lastBiz';});
+    // ② 社保の金額確認 → 毎月15日の定期予定へ統合
+    const isShaho=t=>/社保/.test(t||'')&&/確認/.test(t||'');
+    let shahoText='社保の金額確認';
+    Object.keys(d.events).forEach(k=>{
+      const rest=[];
+      d.events[k].forEach(ev=>{if(isShaho(ev.text)){shahoText=ev.text;}else rest.push(ev);});
+      if(rest.length)d.events[k]=rest;else delete d.events[k];
+    });
+    let kept=false;
+    d.recurring=d.recurring.filter(r=>{
+      if(!isShaho(r.text))return true;
+      if(kept)return false;
+      kept=true;shahoText=r.text;
+      r.type='monthly';r.day=15;delete r.month;delete r.dow;
+      return true;
+    });
+    if(!kept)d.recurring.push({id:uid(),text:shahoText,color:'',type:'monthly',day:15});
+    d.mig4=true;didMigrate=true;
+  }
+  return d;
+}
 function save(){localStorage.setItem(STORE,JSON.stringify(data));pushSync();}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function ymd(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 function lastDay(y,m){return new Date(y,m+1,0).getDate();}
+
+/* ---- 日本の祝日 ---- */
+const _holCache={};
+function nthMonday(y,m,n){const first=new Date(y,m-1,1).getDay();return 1+((8-first)%7)+(n-1)*7;}
+function getHolidays(y){
+  if(_holCache[y])return _holCache[y];
+  const h={};
+  const add=(m,d,n)=>{h[m+'-'+d]=n;};
+  add(1,1,'元日');
+  if(y>=2000)add(1,nthMonday(y,1,2),'成人の日');else add(1,15,'成人の日');
+  if(y>=1967)add(2,11,'建国記念の日');
+  if(y>=2020)add(2,23,'天皇誕生日');
+  add(3,Math.floor(20.8431+0.242194*(y-1980))-Math.floor((y-1980)/4),'春分の日');
+  add(4,29,y>=2007?'昭和の日':'みどりの日');
+  add(5,3,'憲法記念日');
+  if(y>=2007)add(5,4,'みどりの日');
+  add(5,5,'こどもの日');
+  // 海の日（2020・2021は五輪特例）
+  if(y===2020)add(7,23,'海の日');else if(y===2021)add(7,22,'海の日');
+  else if(y>=2003)add(7,nthMonday(y,7,3),'海の日');else if(y>=1996)add(7,20,'海の日');
+  // 山の日
+  if(y===2020)add(8,10,'山の日');else if(y===2021)add(8,8,'山の日');else if(y>=2016)add(8,11,'山の日');
+  // 敬老の日
+  if(y>=2003)add(9,nthMonday(y,9,3),'敬老の日');else add(9,15,'敬老の日');
+  add(9,Math.floor(23.2488+0.242194*(y-1980))-Math.floor((y-1980)/4),'秋分の日');
+  // スポーツの日（旧・体育の日）
+  if(y===2020)add(7,24,'スポーツの日');else if(y===2021)add(7,23,'スポーツの日');
+  else if(y>=2000)add(10,nthMonday(y,10,2),y>=2020?'スポーツの日':'体育の日');else add(10,10,'体育の日');
+  add(11,3,'文化の日');
+  add(11,23,'勤労感謝の日');
+  // 2019年 御即位特例
+  if(y===2019){add(5,1,'天皇の即位の日');add(10,22,'即位礼正殿の儀');}
+  const orig=Object.keys(h);
+  // 国民の休日（祝日に挟まれた平日）
+  orig.forEach(k=>{
+    const p=k.split('-').map(Number);
+    const mid=new Date(y,p[0]-1,p[1]+1);
+    const midKey=(mid.getMonth()+1)+'-'+mid.getDate();
+    const after=new Date(y,p[0]-1,p[1]+2);
+    const afterKey=(after.getMonth()+1)+'-'+after.getDate();
+    if(!h[midKey]&&mid.getDay()!==0&&h[afterKey]&&mid.getFullYear()===y)h[midKey]='国民の休日';
+  });
+  // 振替休日（祝日が日曜 → 次の祝日でない日）
+  orig.forEach(k=>{
+    const p=k.split('-').map(Number);
+    if(new Date(y,p[0]-1,p[1]).getDay()!==0)return;
+    let t=new Date(y,p[0]-1,p[1]+1);
+    while(h[(t.getMonth()+1)+'-'+t.getDate()])t=new Date(t.getFullYear(),t.getMonth(),t.getDate()+1);
+    if(t.getFullYear()===y)h[(t.getMonth()+1)+'-'+t.getDate()]='振替休日';
+  });
+  _holCache[y]=h;
+  return h;
+}
+function holidayName(date){return getHolidays(date.getFullYear())[(date.getMonth()+1)+'-'+date.getDate()]||'';}
+function isOffDay(date){const w=date.getDay();return w===0||w===6||!!holidayName(date);}
+// 月末の平日（土日祝・12/31は避けて直前の平日）
+function lastBizDay(y,m){
+  let d=lastDay(y,m);
+  while(d>1&&(isOffDay(new Date(y,m,d))||(m===11&&d===31)))d--;
+  return d;
+}
 
 // ---- worklog time helpers ----
 function minutesFromHHMM(s){if(!s)return 0;const p=s.split(':');return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0);}
@@ -363,7 +458,11 @@ function durationMinutes(start,end){let a=minutesFromHHMM(start),b=minutesFromHH
 function fmtHM(totalMin){const h=Math.floor(totalMin/60),m=totalMin%60;return h+':'+String(m).padStart(2,'0');}
 
 function recurHitsOnDate(r,date){
-  if(r.type==='monthly'){const ld=lastDay(date.getFullYear(),date.getMonth());const target=r.day==='last'?ld:Math.min(r.day,ld);return date.getDate()===target;}
+  if(r.type==='monthly'){
+    const y=date.getFullYear(),m=date.getMonth(),ld=lastDay(y,m);
+    const target=r.day==='last'?ld:r.day==='lastBiz'?lastBizDay(y,m):Math.min(r.day,ld);
+    return date.getDate()===target;
+  }
   if(r.type==='yearly'){const ld=lastDay(date.getFullYear(),date.getMonth());const target=r.day==='last'?ld:Math.min(r.day,ld);return (date.getMonth()+1)===r.month&&date.getDate()===target;}
   if(r.type==='weekly'){return date.getDay()===r.dow;}
   return false;
@@ -388,7 +487,8 @@ function renderQuickLinks(){
 
 function renderToday(){
   const now=new Date();
-  document.getElementById('todayDateLine').textContent=`${now.getMonth()+1}月${now.getDate()}日（${DOW[now.getDay()]}）`;
+  const hn=holidayName(now);
+  document.getElementById('todayDateLine').innerHTML=`${now.getMonth()+1}月${now.getDate()}日（${DOW[now.getDay()]}）`+(hn?`<span class="hol-name">${hn}</span>`:'');
   const wrap=document.getElementById('todayItems');wrap.innerHTML='';
   const evs=eventsForDate(now);
   const prio=data.tasks.priority.filter(t=>!t.done);
@@ -441,9 +541,10 @@ function renderCal(){
   for(let i=0;i<first;i++){const e=document.createElement('div');e.className='cell empty';grid.appendChild(e);}
   for(let d=1;d<=days;d++){
     const date=new Date(y,m,d),key=ymd(date),dow=date.getDay();
+    const hn=holidayName(date);
     const cell=document.createElement('div');
-    cell.className='cell'+(dow===0?' sun':dow===6?' sat':'')+(key===todayStr?' today':'');
-    cell.innerHTML=`<div class="daynum">${d}</div>`;
+    cell.className='cell'+(dow===0?' sun':dow===6?' sat':'')+(hn?' hol':'')+(key===todayStr?' today':'');
+    cell.innerHTML=`<div class="daynum">${d}${hn?`<span class="hname">${hn}</span>`:''}</div>`;
     eventsForDate(date).forEach(ev=>{
       const e=document.createElement('div');e.className='ev '+(ev.admin?'c-admin admin':(ev.color||''))+(ev.recur&&!ev.admin?' recur':'');e.textContent=ev.text;
       if(ev._manual){e.draggable=true;e.addEventListener('dragstart',ed=>{ed.stopPropagation();ed.dataTransfer.setData('text/plain',JSON.stringify({type:'event',id:ev.id,from:key}));});}
@@ -485,7 +586,8 @@ function renderUtilization(){
 
 function openModal(key,date){
   modalKey=key;modalDate=date;modalColor='';modalRecur='none';
-  document.getElementById('modalDate').textContent=`${date.getMonth()+1}月${date.getDate()}日（${DOW[date.getDay()]}）`;
+  const hn=holidayName(date);
+  document.getElementById('modalDate').innerHTML=`${date.getMonth()+1}月${date.getDate()}日（${DOW[date.getDay()]}）`+(hn?`<span class="hol-name">${hn}</span>`:'');
   document.querySelectorAll('#colorPick .c').forEach((c,i)=>c.classList.toggle('sel',i===0));
   document.querySelectorAll('#recurSeg button').forEach(b=>b.classList.toggle('on',b.dataset.r==='none'));
   renderRecurOpts();renderModalList();
@@ -505,7 +607,7 @@ function openModal(key,date){
 }
 function renderRecurOpts(){
   const wrap=document.getElementById('recurOpts');
-  if(modalRecur==='monthly'){let opts='';for(let i=1;i<=31;i++)opts+=`<option value="${i}" ${i===modalDate.getDate()?'selected':''}>${i}日</option>`;opts+=`<option value="last">月末日</option>`;wrap.innerHTML=`<label>毎月いつ</label><select id="recurDay">${opts}</select>`;}
+  if(modalRecur==='monthly'){let opts='';for(let i=1;i<=31;i++)opts+=`<option value="${i}" ${i===modalDate.getDate()?'selected':''}>${i}日</option>`;opts+=`<option value="last">月末日</option><option value="lastBiz">月末の平日（土日祝は前倒し）</option>`;wrap.innerHTML=`<label>毎月いつ</label><select id="recurDay">${opts}</select>`;}
   else if(modalRecur==='yearly'){let mo='';for(let i=1;i<=12;i++)mo+=`<option value="${i}" ${i===modalDate.getMonth()+1?'selected':''}>${i}月</option>`;let dy='';for(let i=1;i<=31;i++)dy+=`<option value="${i}" ${i===modalDate.getDate()?'selected':''}>${i}日</option>`;dy+=`<option value="last">月末日</option>`;wrap.innerHTML=`<label>毎年いつ</label><div style="display:flex;gap:6px"><select id="recurMonth">${mo}</select><select id="recurDay">${dy}</select></div>`;}
   else if(modalRecur==='weekly'){let opts='';DOW.forEach((d,i)=>opts+=`<option value="${i}" ${i===modalDate.getDay()?'selected':''}>${d}曜日</option>`);wrap.innerHTML=`<label>毎週いつ</label><select id="recurDow">${opts}</select>`;}
   else wrap.innerHTML='';
@@ -527,8 +629,9 @@ function renderModalList(){
 function dotColor(c){return {'':'#cbb46a','c-red':'#c4622d','c-blue':'#5a7a9a','c-green':'#7a9a5a','c-admin':'#b69556'}[c||''];}
 function addEvent(){
   const inp=document.getElementById('evInput');const v=inp.value.trim();if(!v)return;
-  if(modalRecur==='monthly'){const sel=document.getElementById('recurDay').value;data.recurring.push({id:uid(),text:v,color:modalColor,type:'monthly',day:sel==='last'?'last':parseInt(sel)});}
-  else if(modalRecur==='yearly'){const mo=parseInt(document.getElementById('recurMonth').value);const sel=document.getElementById('recurDay').value;data.recurring.push({id:uid(),text:v,color:modalColor,type:'yearly',month:mo,day:sel==='last'?'last':parseInt(sel)});}
+  const parseDay=sel=>(sel==='last'||sel==='lastBiz')?sel:parseInt(sel);
+  if(modalRecur==='monthly'){const sel=document.getElementById('recurDay').value;data.recurring.push({id:uid(),text:v,color:modalColor,type:'monthly',day:parseDay(sel)});}
+  else if(modalRecur==='yearly'){const mo=parseInt(document.getElementById('recurMonth').value);const sel=document.getElementById('recurDay').value;data.recurring.push({id:uid(),text:v,color:modalColor,type:'yearly',month:mo,day:parseDay(sel)});}
   else if(modalRecur==='weekly'){const dw=parseInt(document.getElementById('recurDow').value);data.recurring.push({id:uid(),text:v,color:modalColor,type:'weekly',dow:dw});}
   else{(data.events[modalKey]=data.events[modalKey]||[]).push({id:uid(),text:v,color:modalColor});}
   inp.value='';save();renderModalList();renderCal();renderToday();inp.focus();
@@ -586,6 +689,7 @@ function renderAdminPreview(){
 }
 function addAdminTasks(){
   ADMIN_TASKS.forEach(t=>{
+    if(data.recurring.some(r=>r.text===t.text))return; // 同名の登録済みはスキップ
     data.recurring.push({id:uid(),text:t.text,color:'',admin:true,type:t.type,month:t.month,day:t.day});
   });
   data.adminAdded=true;save();renderCal();renderToday();
@@ -611,7 +715,14 @@ function updateSyncUI(state){
 }
 async function pullSync(){
   if(!syncUrl)return;
-  try{const r=await fetch(syncUrl+'?action=get',{method:'GET'});const j=await r.json();if(j&&j.data){data=migrate(j.data);localStorage.setItem(STORE,JSON.stringify(data));renderAll();}updateSyncUI('on');}
+  try{
+    const r=await fetch(syncUrl+'?action=get',{method:'GET'});const j=await r.json();
+    if(j&&j.data){
+      data=migrate(j.data);localStorage.setItem(STORE,JSON.stringify(data));renderAll();
+      if(didMigrate){didMigrate=false;save();} // 移行結果をクラウドにも反映
+    }
+    updateSyncUI('on');
+  }
   catch(e){updateSyncUI('err');}
 }
 let pushTimer=null;
@@ -664,7 +775,7 @@ modalPagesEl.addEventListener('scroll',()=>{
 });
 
 renderAll();
-if(syncUrl){updateSyncUI('on');pullSync();}else updateSyncUI('off');
+if(syncUrl){updateSyncUI('on');pullSync();}else{updateSyncUI('off');if(didMigrate){didMigrate=false;save();}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&syncUrl)pullSync();});
 </script>
 </body>
