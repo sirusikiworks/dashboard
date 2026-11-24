@@ -65,7 +65,7 @@ function render(){
 }
 function result(id){
  var back='<button class="link" data-a="reset">最初からやりなおす</button>';
- var cp='<div class="btns"><button class="y" data-a="copy">結果をコピーする</button></div><div class="hint" style="margin-top:6px">コピーして、LINEで担当者に送ってください（お名前も書いてください）</div>';
+ var cp='<div class="btns"><button class="y" data-a="copy">結果をコピーする</button></div><div class="hint" style="margin-top:6px">コピーして、LINEで給与担当の千怜宛に送ってください（お名前も書いてください）</div>';
  if(id==='endA'){lastMsg='【年末調整チャートの結果】\n対応不要（12月までにやめる）';}
  if(id==='endB'){lastMsg='【年末調整チャートの結果】\n対応不要（ほかのバイト先に扶養控除等申告書を出している）';}
  if(id==='endA')return '<div class="res ng"><h2>あなたは、年末調整の手続きは不要です</h2><p>12月までにやめる人は、年末調整の対象外です。源泉徴収票は、お店がお渡しします。</p></div>'+cp+back;
